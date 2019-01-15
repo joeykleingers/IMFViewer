@@ -300,6 +300,7 @@ void IMFViewer_UI::importGenericMontage(ImportMontageWizard* montageWizard)
 	  m_workerThread = new QThread;
 	  m_pipeline = FilterPipeline::New();
 	  MontageWorker* montageWorker = new MontageWorker(m_dataContainerArray, m_pipeline, itkMontageFilter);
+    m_pipeline->addMessageReceiver(this);
 	  montageWorker->moveToThread(m_workerThread);
 	  connect(montageWorker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
 	  connect(m_workerThread, SIGNAL(started()), montageWorker, SLOT(process()));
@@ -308,6 +309,18 @@ void IMFViewer_UI::importGenericMontage(ImportMontageWizard* montageWizard)
 	  connect(m_workerThread, SIGNAL(finished()), m_workerThread, SLOT(deleteLater()));
 	  connect(montageWorker, &MontageWorker::resultReady, this, &IMFViewer_UI::handleMontageResults);
 	  m_workerThread->start();
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void IMFViewer_UI::processPipelineMessage(const PipelineMessage &pipelineMsg)
+{
+  if (pipelineMsg.getType() == PipelineMessage::MessageType::StatusMessage)
+  {
+    QString str = pipelineMsg.generateStatusString();
+    statusBar()->showMessage(str);
   }
 }
 
@@ -504,7 +517,8 @@ void IMFViewer_UI::importFijiMontage(ImportMontageWizard* montageWizard)
 	if (itkMontageFilter.get() != nullptr)
 	{
 		MontageWorker* montageWorker = new MontageWorker(m_dataContainerArray, m_pipeline, importFijiMontageFilter, itkMontageFilter);
-		montageWorker->moveToThread(m_workerThread);
+    m_pipeline->addMessageReceiver(this);
+    montageWorker->moveToThread(m_workerThread);
 		connect(montageWorker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
 		connect(m_workerThread, SIGNAL(started()), montageWorker, SLOT(process()));
 		connect(montageWorker, SIGNAL(finished()), m_workerThread, SLOT(quit()));
@@ -624,6 +638,7 @@ void IMFViewer_UI::importRobometMontage(ImportMontageWizard* montageWizard)
 	{
 		MontageWorker* montageWorker = new MontageWorker(dca, m_pipeline, importRoboMetMontageFilter,
 			itkMontageFilter);
+    m_pipeline->addMessageReceiver(this);
 		montageWorker->moveToThread(m_workerThread);
 		connect(montageWorker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
 		connect(m_workerThread, SIGNAL(started()), montageWorker, SLOT(process()));
