@@ -35,8 +35,8 @@
 
 #include "IMFViewer_UI.h"
 
-#include <QtConcurrent>
 #include <QDesktopServices>
+#include <QtConcurrent>
 #include <vtkImageData.h>
 
 #include <QtCore/QDir>
@@ -58,8 +58,8 @@
 #include "SVWidgetsLib/QtSupport/QtSSettings.h"
 #include "SVWidgetsLib/Widgets/SVStyle.h"
 
-#include "SIMPLVtkLib/Common/SIMPLVtkLibConstants.h"
 #include "SIMPLVtkLib/Common/MontageUtilities.h"
+#include "SIMPLVtkLib/Common/SIMPLVtkLibConstants.h"
 #include "SIMPLVtkLib/Dialogs/ImportDREAM3DMontageDialog.h"
 #include "SIMPLVtkLib/Dialogs/ImportFijiMontageDialog.h"
 #include "SIMPLVtkLib/Dialogs/ImportGenericMontageDialog.h"
@@ -74,6 +74,7 @@
 #include "SIMPLVtkLib/QtWidgets/VSQueueModel.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
 
+#include "SIMPLVtkLib/Dialogs/DatasetListWidget.h"
 #include "SIMPLVtkLib/Dialogs/RobometListWidget.h"
 #include "SIMPLVtkLib/Dialogs/ZeissListWidget.h"
 #include "SIMPLVtkLib/Dialogs/ZeissZenListWidget.h"
@@ -81,7 +82,6 @@
 #include "SIMPLVtkLib/Wizards/ExecutePipeline/ExecutePipelineConstants.h"
 #include "SIMPLVtkLib/Wizards/ExecutePipeline/ExecutePipelineWizard.h"
 #include "SIMPLVtkLib/Wizards/ExecutePipeline/PipelineWorker.h"
-#include "SIMPLVtkLib/Dialogs/DatasetListWidget.h"
 
 #include "BrandedStrings.h"
 
@@ -166,7 +166,7 @@ void IMFViewer_UI::importData()
   m_OpenDialogLastDirectory = filePaths[0];
 
   QStringList imagePaths;
-  for(const QString &filePath : filePaths)
+  for(const QString& filePath : filePaths)
   {
     QFileInfo fi(filePath);
     QString ext = fi.completeSuffix();
@@ -298,7 +298,7 @@ void IMFViewer_UI::importDREAM3DMontage()
           [=](const QString& title, const QString& msg, const int& code) { QMessageBox::critical(this, title, msg, QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Ok); });
 
   DataContainerArrayProxy dream3dProxy = MontageUtilities::CreateMontageProxy(reader, dataFilePath, dcNames);
-  if (dream3dProxy == DataContainerArrayProxy())
+  if(dream3dProxy == DataContainerArrayProxy())
   {
     return;
   }
@@ -358,7 +358,8 @@ void IMFViewer_UI::importFijiMontage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IMFViewer_UI::importFijiMontage(const QString& montageName, FijiListInfo_t fijiListInfo, bool overrideSpacing, FloatVec3Type spacing, bool overrideOrigin, FloatVec3Type origin, int32_t lengthUnit)
+void IMFViewer_UI::importFijiMontage(const QString& montageName, FijiListInfo_t fijiListInfo, bool overrideSpacing, FloatVec3Type spacing, bool overrideOrigin, FloatVec3Type origin,
+                                     int32_t lengthUnit)
 {
   VSFilterFactory::Pointer filterFactory = VSFilterFactory::New();
 
@@ -546,7 +547,7 @@ void IMFViewer_UI::importZeissMontage()
   int colCount = importZeissMontage->property("ColumnCount").toInt();
 
   IntVec3Type montageStart = {0, 0, 1};
-  IntVec3Type montageEnd = {colCount-1, rowCount-1, 1};
+  IntVec3Type montageEnd = {colCount - 1, rowCount - 1, 1};
   IntVec3Type montageSize = {colCount, rowCount, 1};
 
   if(m_DisplayType != AbstractImportMontageDialog::DisplayType::SideBySide && m_DisplayType != AbstractImportMontageDialog::DisplayType::Outline)
@@ -634,7 +635,7 @@ void IMFViewer_UI::importZeissZenMontage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IMFViewer_UI::addPipelineToQueue(const FilterPipeline::Pointer &pipeline)
+void IMFViewer_UI::addPipelineToQueue(const FilterPipeline::Pointer& pipeline)
 {
   VSMontageImporter::Pointer importer = VSMontageImporter::New(pipeline);
   connect(importer.get(), &VSMontageImporter::resultReady, this, &IMFViewer_UI::handleMontageResults);
@@ -645,7 +646,7 @@ void IMFViewer_UI::addPipelineToQueue(const FilterPipeline::Pointer &pipeline)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IMFViewer_UI::executePipeline(const FilterPipeline::Pointer &pipeline, const DataContainerArray::Pointer &dca)
+void IMFViewer_UI::executePipeline(const FilterPipeline::Pointer& pipeline, const DataContainerArray::Pointer& dca)
 {
   VSMontageImporter::Pointer importer = VSMontageImporter::New(pipeline, dca);
   connect(importer.get(), &VSMontageImporter::resultReady, this, &IMFViewer_UI::handleMontageResults);
@@ -678,7 +679,7 @@ void IMFViewer_UI::handleDatasetResults(VSFileNameFilter* textFilter, VSDataSetF
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IMFViewer_UI::handleMontageResults(const FilterPipeline::Pointer &pipeline, int err)
+void IMFViewer_UI::handleMontageResults(const FilterPipeline::Pointer& pipeline, int err)
 {
   if(err >= 0)
   {
@@ -693,7 +694,7 @@ void IMFViewer_UI::handleMontageResults(const FilterPipeline::Pointer &pipeline,
     // If Display Montage was selected, remove non-stitched image data containers
     if(m_DisplayType == AbstractImportMontageDialog::DisplayType::Montage)
     {
-      for(const DataContainer::Pointer &dc : dca->getDataContainers())
+      for(const DataContainer::Pointer& dc : dca->getDataContainers())
       {
         if(dc->getName() == "MontageDC")
         {
@@ -726,7 +727,7 @@ void IMFViewer_UI::importData(const QString& filePath)
   VSFilterModel* filterModel = baseWidget->getController()->getFilterModel();
   VSRootFilter* rootFilter = filterModel->getRootFilter();
   VSFileNameFilter* textFilter = new VSFileNameFilter(filePath);
-  textFilter->setParentFilter((VSAbstractFilter*) rootFilter);
+  textFilter->setParentFilter((VSAbstractFilter*)rootFilter);
   VSDataSetFilter* filter = new VSDataSetFilter(filePath, textFilter);
   VSDatasetImporter::Pointer importer = VSDatasetImporter::New(textFilter, filter);
   connect(importer.get(), &VSDatasetImporter::resultReady, this, &IMFViewer_UI::handleDatasetResults);
@@ -740,7 +741,7 @@ void IMFViewer_UI::importData(const QString& filePath)
 // -----------------------------------------------------------------------------
 void IMFViewer_UI::importImages(const QStringList& filePaths)
 {
-  if (filePaths.empty())
+  if(filePaths.empty())
   {
     return;
   }
@@ -750,20 +751,20 @@ void IMFViewer_UI::importImages(const QStringList& filePaths)
   FilterPipeline::Pointer pipeline = FilterPipeline::New();
   QFileInfo fi(filePaths[0]);
   pipeline->setName(fi.dir().dirName());
-    
+
   for(int i = 0; i < filePaths.size(); i++)
   {
-  QString filePath = filePaths[i];
-  fi.setFile(filePath);
-  DataArrayPath dcPath(fi.fileName(), "", "");
-  AbstractFilter::Pointer imageReaderFilter = filterFactory->createImageFileReaderFilter(filePath, dcPath);
-	if(!imageReaderFilter)
-	{
-	  // Error!
-	  continue;
-	}
+    QString filePath = filePaths[i];
+    fi.setFile(filePath);
+    DataArrayPath dcPath(fi.fileName(), "", "");
+    AbstractFilter::Pointer imageReaderFilter = filterFactory->createImageFileReaderFilter(filePath, dcPath);
+    if(!imageReaderFilter)
+    {
+      // Error!
+      continue;
+    }
 
-	pipeline->pushBack(imageReaderFilter);
+    pipeline->pushBack(imageReaderFilter);
   }
 
   // Run the pipeline
@@ -811,11 +812,8 @@ void IMFViewer_UI::importPipeline(ExecutePipelineWizard* executePipelineWizard)
 
   filterViewModel->setDisplayType(m_DisplayType);
 
-  QString filePath = executePipelineWizard->field(ExecutePipeline::FieldNames::PipelineFile)
-    .toString();
-  ExecutePipelineWizard::ExecutionType executionType = executePipelineWizard
-    ->field(ExecutePipeline::FieldNames::ExecutionType)
-    .value<ExecutePipelineWizard::ExecutionType>();
+  QString filePath = executePipelineWizard->field(ExecutePipeline::FieldNames::PipelineFile).toString();
+  ExecutePipelineWizard::ExecutionType executionType = executePipelineWizard->field(ExecutePipeline::FieldNames::ExecutionType).value<ExecutePipelineWizard::ExecutionType>();
 
   if(filePath.isEmpty())
   {
@@ -838,84 +836,84 @@ void IMFViewer_UI::importPipeline(ExecutePipelineWizard* executePipelineWizard)
   {
     if(executionType == ExecutePipelineWizard::ExecutionType::FromFilesystem)
     {
-    addPipelineToQueue(pipelineFromJson);
+      addPipelineToQueue(pipelineFromJson);
     }
     else if(executionType == ExecutePipelineWizard::ExecutionType::OnLoadedData)
     {
-    int startFilter = executePipelineWizard->field(ExecutePipeline::FieldNames::StartFilter).toInt();
-    int selectedDataset = executePipelineWizard->field(ExecutePipeline::FieldNames::SelectedDataset).toInt();
+      int startFilter = executePipelineWizard->field(ExecutePipeline::FieldNames::StartFilter).toInt();
+      int selectedDataset = executePipelineWizard->field(ExecutePipeline::FieldNames::SelectedDataset).toInt();
 
-    // Construct Data Container Array with selected Dataset
-    DataContainerArray::Pointer dca = DataContainerArray::New();
-    VSMainWidgetBase* baseWidget = dynamic_cast<VSMainWidgetBase*>(m_Ui->vsWidget);
-    VSController* controller = baseWidget->getController();
-    VSAbstractFilter::FilterListType datasets = controller->getBaseFilters();
-    int i = 0;
-    for(VSAbstractFilter* dataset : datasets)
-    {
-      if(i == selectedDataset)
+      // Construct Data Container Array with selected Dataset
+      DataContainerArray::Pointer dca = DataContainerArray::New();
+      VSMainWidgetBase* baseWidget = dynamic_cast<VSMainWidgetBase*>(m_Ui->vsWidget);
+      VSController* controller = baseWidget->getController();
+      VSAbstractFilter::FilterListType datasets = controller->getBaseFilters();
+      int i = 0;
+      for(VSAbstractFilter* dataset : datasets)
       {
-      // Add contents to data container array
-      VSAbstractFilter::FilterListType children = dataset->getChildren();
-      for(VSAbstractFilter* childFilter : children)
-      {
-        bool isSIMPL = (dynamic_cast<VSSIMPLDataContainerFilter*>(childFilter) != nullptr);
-        if(isSIMPL)
+        if(i == selectedDataset)
         {
-        VSSIMPLDataContainerFilter* dcFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(childFilter);
-        if(dcFilter != nullptr)
+          // Add contents to data container array
+          VSAbstractFilter::FilterListType children = dataset->getChildren();
+          for(VSAbstractFilter* childFilter : children)
+          {
+            bool isSIMPL = (dynamic_cast<VSSIMPLDataContainerFilter*>(childFilter) != nullptr);
+            if(isSIMPL)
+            {
+              VSSIMPLDataContainerFilter* dcFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(childFilter);
+              if(dcFilter != nullptr)
+              {
+                DataContainer::Pointer dataContainer = dcFilter->getWrappedDataContainer()->m_DataContainer;
+                dca->addOrReplaceDataContainer(dataContainer);
+              }
+            }
+          }
+          break;
+        }
+        i++;
+      }
+      // Change origin and/or spacing if specified
+      FilterPipeline::Pointer pipeline = FilterPipeline::New();
+      VSFilterFactory::Pointer filterFactory = VSFilterFactory::New();
+      QStringList dcNames = dca->getDataContainerNames();
+
+      bool changeSpacing = executePipelineWizard->field(ExecutePipeline::FieldNames::ChangeSpacing).toBool();
+      bool changeOrigin = executePipelineWizard->field(ExecutePipeline::FieldNames::ChangeOrigin).toBool();
+      if(changeSpacing || changeOrigin)
+      {
+        float spacingX = executePipelineWizard->field(ExecutePipeline::FieldNames::SpacingX).toFloat();
+        float spacingY = executePipelineWizard->field(ExecutePipeline::FieldNames::SpacingY).toFloat();
+        float spacingZ = executePipelineWizard->field(ExecutePipeline::FieldNames::SpacingZ).toFloat();
+        FloatVec3Type newSpacing = {spacingX, spacingY, spacingZ};
+        float originX = executePipelineWizard->field(ExecutePipeline::FieldNames::OriginX).toFloat();
+        float originY = executePipelineWizard->field(ExecutePipeline::FieldNames::OriginY).toFloat();
+        float originZ = executePipelineWizard->field(ExecutePipeline::FieldNames::OriginZ).toFloat();
+        FloatVec3Type newOrigin = {originX, originY, originZ};
+
+        // For each data container, add a new filter
+        for(const QString& dcName : dcNames)
         {
-          DataContainer::Pointer dataContainer = dcFilter->getWrappedDataContainer()->m_DataContainer;
-          dca->addOrReplaceDataContainer(dataContainer);
+          DataArrayPath dcPath(dcName, "", "");
+          AbstractFilter::Pointer setOriginResolutionFilter = filterFactory->createSetOriginResolutionFilter(dcPath, changeSpacing, changeOrigin, newSpacing, newOrigin);
+
+          if(!setOriginResolutionFilter)
+          {
+            // Error!
+          }
+
+          pipeline->pushBack(setOriginResolutionFilter);
         }
-        }
       }
-      break;
-      }
-      i++;
-    }
-    // Change origin and/or spacing if specified
-    FilterPipeline::Pointer pipeline = FilterPipeline::New();
-    VSFilterFactory::Pointer filterFactory = VSFilterFactory::New();
-    QStringList dcNames = dca->getDataContainerNames();
 
-    bool changeSpacing = executePipelineWizard->field(ExecutePipeline::FieldNames::ChangeSpacing).toBool();
-    bool changeOrigin = executePipelineWizard->field(ExecutePipeline::FieldNames::ChangeOrigin).toBool();
-    if(changeSpacing || changeOrigin)
-    {
-      float spacingX = executePipelineWizard->field(ExecutePipeline::FieldNames::SpacingX).toFloat();
-      float spacingY = executePipelineWizard->field(ExecutePipeline::FieldNames::SpacingY).toFloat();
-      float spacingZ = executePipelineWizard->field(ExecutePipeline::FieldNames::SpacingZ).toFloat();
-      FloatVec3Type newSpacing = { spacingX, spacingY, spacingZ };
-      float originX = executePipelineWizard->field(ExecutePipeline::FieldNames::OriginX).toFloat();
-      float originY = executePipelineWizard->field(ExecutePipeline::FieldNames::OriginY).toFloat();
-      float originZ = executePipelineWizard->field(ExecutePipeline::FieldNames::OriginZ).toFloat();
-      FloatVec3Type newOrigin = { originX, originY, originZ };
-
-      // For each data container, add a new filter
-      for(const QString &dcName : dcNames)
+      // Reconstruct pipeline starting with new start filter
+      for(int i = startFilter; i < pipelineFromJson->getFilterContainer().size(); i++)
       {
-        DataArrayPath dcPath(dcName, "", "");
-        AbstractFilter::Pointer setOriginResolutionFilter = filterFactory->createSetOriginResolutionFilter(dcPath, changeSpacing, changeOrigin, newSpacing, newOrigin);
-
-      if(!setOriginResolutionFilter)
-      {
-        // Error!
+        AbstractFilter::Pointer filter = pipelineFromJson->getFilterContainer().at(i);
+        filter->setDataContainerArray(dca);
+        pipeline->pushBack(filter);
       }
 
-      pipeline->pushBack(setOriginResolutionFilter);
-      }
-    }
-
-    // Reconstruct pipeline starting with new start filter
-    for(int i = startFilter; i < pipelineFromJson->getFilterContainer().size(); i++)
-    {
-      AbstractFilter::Pointer filter = pipelineFromJson->getFilterContainer().at(i);
-      filter->setDataContainerArray(dca);
-      pipeline->pushBack(filter);
-    }
-
-    executePipeline(pipeline, dca);
+      executePipeline(pipeline, dca);
     }
   }
 }
@@ -975,7 +973,7 @@ void IMFViewer_UI::performMontage()
         DataContainer::Pointer dataContainer = dcFilter->getWrappedDataContainer()->m_DataContainer;
         if(dataContainer != DataContainer::NullPointer())
         {
-          for(const AttributeMatrix::Pointer &am : dataContainer->getAttributeMatrices())
+          for(const AttributeMatrix::Pointer& am : dataContainer->getAttributeMatrices())
           {
             std::vector<size_t> tupleDims = am->getTupleDimensions();
             if(tupleDims.size() >= 2)
@@ -1002,8 +1000,8 @@ void IMFViewer_UI::performMontage()
 
     if(!stitchingOnly)
     {
-//      AbstractFilter::Pointer itkRegistrationFilter = filterFactory->createPCMTileRegistrationFilter(montageSize, dcNames, amName, daName);
-//      pipeline->pushBack(itkRegistrationFilter);
+      //      AbstractFilter::Pointer itkRegistrationFilter = filterFactory->createPCMTileRegistrationFilter(montageSize, dcNames, amName, daName);
+      //      pipeline->pushBack(itkRegistrationFilter);
     }
 
     DataArrayPath montagePath("MontageDC", "MontageAM", "MontageData");
@@ -1111,32 +1109,30 @@ void IMFViewer_UI::saveImage()
   QString filePath = QFileDialog::getSaveFileName(this, "Save As Image File", m_OpenDialogLastDirectory, filter);
   if(filePath.isEmpty())
   {
-	return;
+    return;
   }
 
   m_OpenDialogLastDirectory = filePath;
   VSController* controller = m_Ui->vsWidget->getController();
   VSMainWidgetBase* baseWidget = dynamic_cast<VSMainWidgetBase*>(m_Ui->vsWidget);
-//  VSFilterViewModel* filterViewModel = baseWidget->getActiveViewWidget()->getFilterViewModel();
+  //  VSFilterViewModel* filterViewModel = baseWidget->getActiveViewWidget()->getFilterViewModel();
   VSAbstractFilter::FilterListType selectedFilters = baseWidget->getActiveViewWidget()->getSelectedFilters();
 
   bool success = controller->saveAsImage(filePath, selectedFilters.front());
 
   if(success)
   {
-	// Add file to the recent files list
-	QtSRecentFileList* list = QtSRecentFileList::Instance();
-	list->addFile(filePath);
+    // Add file to the recent files list
+    QtSRecentFileList* list = QtSRecentFileList::Instance();
+    list->addFile(filePath);
 
-	// Open the image in the default application for the system
-	QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+    // Open the image in the default application for the system
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
   }
   else
   {
-	QMessageBox::critical(this, "Invalid Filter Type",
-	  tr("The filter must be a data container filter."),
-	  QMessageBox::StandardButton::Ok);
-	return;
+    QMessageBox::critical(this, "Invalid Filter Type", tr("The filter must be a data container filter."), QMessageBox::StandardButton::Ok);
+    return;
   }
 }
 
@@ -1155,11 +1151,10 @@ void IMFViewer_UI::saveDream3d()
   }
 
   QString filter = tr("DREAM3D File (*.dream3d)");
-  QString filePath = QFileDialog::getSaveFileName(this, "Save As DREAM3D File",
-	m_OpenDialogLastDirectory, filter);
+  QString filePath = QFileDialog::getSaveFileName(this, "Save As DREAM3D File", m_OpenDialogLastDirectory, filter);
   if(filePath.isEmpty())
   {
-	return;
+    return;
   }
 
   m_OpenDialogLastDirectory = filePath;
@@ -1168,16 +1163,14 @@ void IMFViewer_UI::saveDream3d()
 
   if(success)
   {
-	// Add file to the recent files list
-	QtSRecentFileList* list = QtSRecentFileList::Instance();
-	list->addFile(filePath);
+    // Add file to the recent files list
+    QtSRecentFileList* list = QtSRecentFileList::Instance();
+    list->addFile(filePath);
   }
   else
   {
-	QMessageBox::critical(this, "Invalid Filter Type",
-	  tr("The filter must be a data container or pipeline filter."),
-	  QMessageBox::StandardButton::Ok);
-	return;
+    QMessageBox::critical(this, "Invalid Filter Type", tr("The filter must be a data container or pipeline filter."), QMessageBox::StandardButton::Ok);
+    return;
   }
 }
 
@@ -1499,9 +1492,8 @@ void IMFViewer_UI::listenSelectionChanged(VSAbstractFilter::FilterListType filte
 {
   bool isSIMPL = !filters.empty() && dynamic_cast<VSSIMPLDataContainerFilter*>(filters.front()) != nullptr;
   bool isPipeline = !filters.empty() && dynamic_cast<VSPipelineFilter*>(filters.front()) != nullptr;
-  bool isDream3dFile =
-      !filters.empty() && dynamic_cast<VSFileNameFilter*>(filters.front()) != nullptr && filters.front()->getChildCount() > 0
-      && dynamic_cast<VSSIMPLDataContainerFilter*>(filters.front()->getChildren().front()) != nullptr;
+  bool isDream3dFile = !filters.empty() && dynamic_cast<VSFileNameFilter*>(filters.front()) != nullptr && filters.front()->getChildCount() > 0 &&
+                       dynamic_cast<VSSIMPLDataContainerFilter*>(filters.front()->getChildren().front()) != nullptr;
   QList<QAction*> actions = m_MenuBar->actions();
   for(QAction* action : actions)
   {
@@ -1539,7 +1531,7 @@ void IMFViewer_UI::listenSelectionChanged(VSAbstractFilter::FilterListType filte
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-std::pair<int, int> IMFViewer_UI::buildCustomDCA(const DataContainerArray::Pointer &dca, VSAbstractFilter::FilterListType montageDatasets)
+std::pair<int, int> IMFViewer_UI::buildCustomDCA(const DataContainerArray::Pointer& dca, VSAbstractFilter::FilterListType montageDatasets)
 {
   // Get the minimum X and minimum Y coordinates to use as a 'base'
   // This is useful to handle edge cases where the position values are large
@@ -1574,33 +1566,31 @@ std::pair<int, int> IMFViewer_UI::buildCustomDCA(const DataContainerArray::Point
     }
   }
 
-  montageDatasets.sort([minX](VSAbstractFilter* first, VSAbstractFilter* second)
-  {
-	VSTransform* firstTransform = first->getTransform();
-	VSTransform* secondTransform = second->getTransform();
-  if(dynamic_cast<VSFileNameFilter*>(first) != nullptr && dynamic_cast<VSFileNameFilter*>(second) != nullptr)
-	{
-	  firstTransform = first->getChildren().front()->getTransform();
-	  secondTransform = second->getChildren().front()->getTransform();
-	}
-	int firstX = firstTransform->getLocalPosition()[0] - minX;
+  montageDatasets.sort([minX](VSAbstractFilter* first, VSAbstractFilter* second) {
+    VSTransform* firstTransform = first->getTransform();
+    VSTransform* secondTransform = second->getTransform();
+    if(dynamic_cast<VSFileNameFilter*>(first) != nullptr && dynamic_cast<VSFileNameFilter*>(second) != nullptr)
+    {
+      firstTransform = first->getChildren().front()->getTransform();
+      secondTransform = second->getChildren().front()->getTransform();
+    }
+    int firstX = firstTransform->getLocalPosition()[0] - minX;
     int secondX = secondTransform->getLocalPosition()[0] - minX;
-	bool secondXGreaterThanFirstX = floor(1.05 * firstX) < secondX;
-	return secondXGreaterThanFirstX;
+    bool secondXGreaterThanFirstX = floor(1.05 * firstX) < secondX;
+    return secondXGreaterThanFirstX;
   });
-  montageDatasets.sort([minY](VSAbstractFilter* first, VSAbstractFilter* second)
-  {
-	VSTransform* firstTransform = first->getTransform();
-	VSTransform* secondTransform = second->getTransform();
-  if(dynamic_cast<VSFileNameFilter*>(first) != nullptr && dynamic_cast<VSFileNameFilter*>(second) != nullptr)
-	{
-	  firstTransform = first->getChildren().front()->getTransform();
-	  secondTransform = second->getChildren().front()->getTransform();
-	}
+  montageDatasets.sort([minY](VSAbstractFilter* first, VSAbstractFilter* second) {
+    VSTransform* firstTransform = first->getTransform();
+    VSTransform* secondTransform = second->getTransform();
+    if(dynamic_cast<VSFileNameFilter*>(first) != nullptr && dynamic_cast<VSFileNameFilter*>(second) != nullptr)
+    {
+      firstTransform = first->getChildren().front()->getTransform();
+      secondTransform = second->getChildren().front()->getTransform();
+    }
     int firstY = firstTransform->getLocalPosition()[1] - minY;
     int secondY = secondTransform->getLocalPosition()[1] - minY;
-	bool secondYGreaterThanFirstY = floor(1.05 * firstY) < secondY;
-	return secondYGreaterThanFirstY;
+    bool secondYGreaterThanFirstY = floor(1.05 * firstY) < secondY;
+    return secondYGreaterThanFirstY;
   });
 
   int row = 0;
@@ -1613,70 +1603,68 @@ std::pair<int, int> IMFViewer_UI::buildCustomDCA(const DataContainerArray::Point
 
   for(iterator = montageDatasets.begin(); iterator != montageDatasets.end(); ++iterator)
   {
-	VSAbstractFilter* montageDataset = *iterator;
-	double* pos = montageDataset->getTransform()->getLocalPosition();
-  if(dynamic_cast<VSFileNameFilter*>(montageDataset) != nullptr)
-	{
-	  pos = montageDataset->getChildren().front()->getTransform()->getLocalPosition();
-	}
-	if(firstDataset)
-	{
-	  prevX = pos[0];
-	  prevY = pos[1];
-	  firstDataset = false;
-	}
-	else
-	{
-	  if(pos[0] > prevX)
-	  {
-		col++;
-	  }
-	  else
-	  {
-		row++;
-		col = 0;
-	  }
-	  if((row + 1) > numRows)
-	  {
-		numRows = row + 1;
-	  }
-	  if((col + 1) > numCols)
-	  {
-		numCols = col + 1;
-	  }
-	  prevX = pos[0];
-	  prevY = pos[1];
-	}
-	DataContainer::Pointer dataContainer;
-	VSSIMPLDataContainerFilter* dcFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(montageDataset);
-	VSFileNameFilter* filenameFilter = dynamic_cast<VSFileNameFilter*>(montageDataset);
-	QString dataContainerPrefix;
-	QString rowColIdString = tr("r%1c%2").arg(row).arg(col);
-	if(dcFilter != nullptr)
-	{
-	  dataContainer = dcFilter->getWrappedDataContainer()->m_DataContainer;
-	  QString dataContainerName = dataContainer->getName();
-	  int indexOfUnderscore = dataContainerName.lastIndexOf("_");
-	  dataContainerPrefix = dataContainerName.left(indexOfUnderscore - 1);
-	}
-	else if (filenameFilter != nullptr)
-	{
-	  dataContainerPrefix = filenameFilter->getFilterName();
-	  dataContainer = DataContainer::New(dataContainerPrefix);
-  }
-  QString dcName = tr("%1_%2").arg(dataContainerPrefix, rowColIdString);
-	dataContainer->setName(dcName);
+    VSAbstractFilter* montageDataset = *iterator;
+    double* pos = montageDataset->getTransform()->getLocalPosition();
+    if(dynamic_cast<VSFileNameFilter*>(montageDataset) != nullptr)
+    {
+      pos = montageDataset->getChildren().front()->getTransform()->getLocalPosition();
+    }
+    if(firstDataset)
+    {
+      prevX = pos[0];
+      prevY = pos[1];
+      firstDataset = false;
+    }
+    else
+    {
+      if(pos[0] > prevX)
+      {
+        col++;
+      }
+      else
+      {
+        row++;
+        col = 0;
+      }
+      if((row + 1) > numRows)
+      {
+        numRows = row + 1;
+      }
+      if((col + 1) > numCols)
+      {
+        numCols = col + 1;
+      }
+      prevX = pos[0];
+      prevY = pos[1];
+    }
+    DataContainer::Pointer dataContainer;
+    VSSIMPLDataContainerFilter* dcFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(montageDataset);
+    VSFileNameFilter* filenameFilter = dynamic_cast<VSFileNameFilter*>(montageDataset);
+    QString dataContainerPrefix;
+    QString rowColIdString = tr("r%1c%2").arg(row).arg(col);
+    if(dcFilter != nullptr)
+    {
+      dataContainer = dcFilter->getWrappedDataContainer()->m_DataContainer;
+      QString dataContainerName = dataContainer->getName();
+      int indexOfUnderscore = dataContainerName.lastIndexOf("_");
+      dataContainerPrefix = dataContainerName.left(indexOfUnderscore - 1);
+    }
+    else if(filenameFilter != nullptr)
+    {
+      dataContainerPrefix = filenameFilter->getFilterName();
+      dataContainer = DataContainer::New(dataContainerPrefix);
+    }
+    QString dcName = tr("%1_%2").arg(dataContainerPrefix, rowColIdString);
+    dataContainer->setName(dcName);
 
-	ImageGeom::Pointer geom = dataContainer->getGeometryAs<ImageGeom>();
-	if(geom == ImageGeom::NullPointer())
-	{
-	  geom = ImageGeom::New();
-	  dataContainer->setGeometry(geom);
-	}
-	geom->setOrigin(pos[0], pos[1], 1.0f);
-	dca->addOrReplaceDataContainer(dataContainer);
-
+    ImageGeom::Pointer geom = dataContainer->getGeometryAs<ImageGeom>();
+    if(geom == ImageGeom::NullPointer())
+    {
+      geom = ImageGeom::New();
+      dataContainer->setGeometry(geom);
+    }
+    geom->setOrigin(pos[0], pos[1], 1.0f);
+    dca->addOrReplaceDataContainer(dataContainer);
   }
   return {numRows, numCols};
 }
-
