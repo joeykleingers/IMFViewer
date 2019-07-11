@@ -370,7 +370,7 @@ void IMFViewer_UI::importFijiMontage(const QString& montageName, FijiListInfo_t 
   QString amName = "Cell Attribute Matrix";
   QString daName = "Image Data";
   AbstractFilter::Pointer importFijiMontageFilter =
-      filterFactory->createImportFijiMontageFilter(fijiConfigFilePath, dcPath, amName, daName, overrideOrigin, origin.data(), overrideSpacing, spacing.data(), lengthUnit);
+      filterFactory->createImportFijiMontageFilter(fijiConfigFilePath, montageName, dcPath, amName, daName, overrideOrigin, origin.data(), overrideSpacing, spacing.data(), lengthUnit);
   if(!importFijiMontageFilter)
   {
     // Error!
@@ -452,7 +452,7 @@ void IMFViewer_UI::importRobometMontage()
     }
     QString imageFileExtension = rbmListInfo.ImageExtension;
 
-    AbstractFilter::Pointer importRoboMetMontageFilter = filterFactory->createImportRobometMontageFilter(robometFilePath, dcPath, amName, daName, slice, imagePrefix, imageFileExtension,
+    AbstractFilter::Pointer importRoboMetMontageFilter = filterFactory->createImportRobometMontageFilter(robometFilePath, montageName, dcPath, amName, daName, slice, imagePrefix, imageFileExtension,
                                                                                                          overrideOrigin, origin.data(), overrideSpacing, spacing.data(), lengthUnit);
     if(!importRoboMetMontageFilter)
     {
@@ -529,8 +529,8 @@ void IMFViewer_UI::importZeissMontage()
   FloatVec3Type origin = dialog->getOrigin();
   FloatVec3Type colorWeighting = dialog->getColorWeighting();
 
-  importZeissMontage = filterFactory->createImportZeissMontageFilter(configFilePath, dcPath, amName, daName, metadataAMName, importAllMetadata, convertToGrayscale, colorWeighting, changeOrigin,
-                                                                     origin, changeSpacing, spacing);
+  importZeissMontage = filterFactory->createImportZeissMontageFilter(configFilePath, montageName, dcPath, amName, daName, metadataAMName, importAllMetadata, convertToGrayscale, colorWeighting,
+                                                                     changeOrigin, origin, changeSpacing, spacing);
 
   if(!importZeissMontage)
   {
@@ -599,7 +599,7 @@ void IMFViewer_UI::importZeissZenMontage()
   FloatVec3Type origin = dialog->getOrigin();
   FloatVec3Type colorWeighting = dialog->getColorWeighting();
 
-  importZeissMontage = filterFactory->createImportZeissZenMontageFilter(configFilePath, dcPath, amName, daName, convertToGrayscale, colorWeighting, changeOrigin, origin);
+  importZeissMontage = filterFactory->createImportZeissZenMontageFilter(configFilePath, montageName, dcPath, amName, daName, convertToGrayscale, colorWeighting, changeOrigin, origin);
 
   if(!importZeissMontage)
   {
